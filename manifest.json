@@ -1,26 +1,35 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "eyeshade",
-  "version": "0.0.0.1",
+  "version": "0.0.1.0",
   "description": "An extension to block as many sites as you want",
-  "page_action": {
+  "action": {
+    "default_icon": {
+      "16": "Eyeshade.png",
+      "32": "Eyeshade.png",
+      "128": "Eyeshade.png"
+    },
+    "default_title": "Right Click Me",
     "default_popup": "popup/popup.html"
   },
   "background": {
-    "scripts": ["public/background.js"],
-    "persistent": false
+    "service_worker": "public/background.js"
   },
-
   "web_accessible_resources": [
-    "not_available/not_available.html"
+    {
+      "resources": ["not_available/not_available.html"],
+      "matches": ["<all_urls>"]
+    }
   ],
-
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["content.js"]
+    }
+  ],
   "options_page": "options/options.html",
 
-  "permissions": [
-    "storage",
-    "tabs"
-  ],
+  "permissions": ["storage", "tabs", "webNavigation"],
   "icons": {
     "16": "Eyeshade.png",
     "48": "Eyeshade.png",

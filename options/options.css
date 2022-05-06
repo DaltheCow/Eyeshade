@@ -23,7 +23,7 @@ body {
   border-radius: 29px;
   background-color: #f16132;
   cursor: pointer;
-  transition: background-color .5s;
+  transition: background-color 0.5s;
 }
 
 .switcher_slider.checked {
@@ -39,7 +39,7 @@ body {
   border-radius: 12px;
   position: relative;
   left: calc(0% + 5px);
-  transition: left .5s;
+  transition: left 0.5s;
 }
 
 .switcher_slider.checked:before {
@@ -65,4 +65,21 @@ body {
   display: flex;
   justify-content: flex-end;
   width: 40px;
+}
+
+.content-column {
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.fake-link {
+  cursor: default;
+}
+
+.icon-container {
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
 }
