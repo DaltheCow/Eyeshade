@@ -83,3 +83,8 @@ body {
 button {
   cursor: pointer;
 }
+
+.content-column h4 {
+  line-height: 2em;
+  margin: 0 0 10px 0;
+}

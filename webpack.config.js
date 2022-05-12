@@ -1,38 +1,27 @@
-const { resolve } = require('path');
+const { resolve } = require("path");
 
 module.exports = {
+  devtool: "inline-source-map",
   entry: {
-    popup: './popup/index.jsx',
-    options: './options/index.jsx',
-    not_available: './not_available/index.jsx',
-    background: './background/index.js'
+    popup: "./popup/index.tsx",
+    options: "./options/index.tsx",
+    not_available: "./not_available/index.tsx",
+    background: "./background/index.ts",
   },
   output: {
-    path: resolve('./public'),
-    filename: '[name].js'
+    path: resolve("./public"),
+    filename: "[name].js",
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: [".js", ".ts", ".tsx"],
   },
   module: {
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.tsx?$/,
+        use: "ts-loader",
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
-        },
-    },
-    {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
-        },
-    },
-    ]
+      },
+    ],
   },
-  devtool: '#inline-source-map',
 };
