@@ -72,8 +72,10 @@ const NotAvailable = () => {
   return (
     <div className="quotes-container">
       <Paper elevation={5} className={`quotes-card ${theme}`}>
-        <h3 style={{ margin: "20px" }}>{quote.title}</h3>
-        <span>{quote.text}</span>
+        <div className="quotes-card-content">
+          <h3 style={{ margin: "20px" }}>{quote.title}</h3>
+          <span>{quote.text}</span>
+        </div>
       </Paper>
     </div>
   );

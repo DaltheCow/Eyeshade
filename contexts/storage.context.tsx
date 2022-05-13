@@ -1,22 +1,32 @@
 import { Settings } from "background";
 import * as React from "react";
 import { getStorage, setStorage, getStorageAll } from "../modules/storage";
+import { RedirectEnum } from "../background/index";
 
 const Context = React.createContext({
   isLoaded: false,
   dataStorage: {} as Settings,
   deleteLink: (url: string) => {},
   deleteWhiteListLink: (url: string) => {},
-  setFields: (fields: any) => {},
-  addSite: (url: any) => {},
-  addWhiteListSite: (url: string) => {},
-  updateRedirectLink: (url: string) => {},
+  setToggles: (fields: { isBlocking: boolean; isWhiteListing: boolean }) => {},
+  addSite: (url: string) => {},
+  addWhiteListSite: async (url: string) => new Promise(null),
+  updateRedirectLink: async (url: string) => {},
   updateRedirectOption: (redirectOption: string) => {},
 });
 
 type StorageContextProps = {
   children: any;
 };
+
+enum FieldUpdateEnum {
+  UPDATE_REDIRECT_OPTION = "update redirectOption",
+  UPDATE_REDIRECT_LINK = "update redirectLink",
+  ADD_TO_SITELIST = "add to siteList",
+  UPDATE_IS_BLOCKING = "update isBlocking",
+  UPDATE_IS_WHITELISTING = "update isWhiteListing",
+  REMOVE_FROM_WHITELIST = "remove from whitelist",
+}
 
 export const StorageProvider = ({ children }: StorageContextProps) => {
   const [isLoaded, setIsLoaded] = React.useState(false);
@@ -49,6 +59,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
           "isWhiteListing",
           "whiteListSites",
           "redirectLink",
+          "redirectOption",
         ];
         while (JSON.stringify(oldValue[fields[0]]) === JSON.stringify(newValue[fields[0]])) {
           fields.shift();
@@ -61,16 +72,27 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     return () => chrome.storage.onChanged.removeListener(listenerFunc);
   }, [dataStorage]);
 
-  const setFields = (fields: any) => {
-    return getStorage("settings", (data: any) => {
+  const setToggles = async (fields: { isBlocking: boolean; isWhiteListing: boolean }) => {
+    for (let prop in fields) {
+      let fieldUpdate =
+        prop === "isBlocking"
+          ? FieldUpdateEnum.UPDATE_IS_BLOCKING
+          : FieldUpdateEnum.UPDATE_IS_WHITELISTING;
+      if (prop === "isBlocking" || prop === "isWhiteListing") {
+        await conflictHandler(fieldUpdate, fields[prop]);
+      }
+    }
+    getStorage("settings", (data: any) => {
       const settings = { ...data.settings, ...fields };
+      console.log("🚀 ~ file: storage.context.tsx ~ line 87 ~ getStorage ~ settings", settings);
       setStorage("settings", { settings }, () => {
         setDataStorage(settings);
       });
     });
   };
 
-  const addSite = (url: any) => {
+  const addSite = async (url: string) => {
+    await conflictHandler(FieldUpdateEnum.ADD_TO_SITELIST, url);
     getStorage("settings", (data: any) => {
       const oldSiteList = data.settings.siteList;
       if (!oldSiteList.includes(url)) {
@@ -82,8 +104,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     });
   };
 
-  const addWhiteListSite = (url: any) => {
-    getStorage("settings", (data: any) => {
+  const addWhiteListSite = async (url: string) => {
+    return getStorage("settings", (data: any) => {
       const whiteListSites = data.settings.whiteListSites;
       if (!whiteListSites.includes(url)) {
         const settings = {
@@ -97,36 +119,14 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     });
   };
 
-  const isStartingStringMatch = (str1: string, str2: string) => {
-    return str1.indexOf(str2) === 0 || str2.indexOf(str1) === 0;
-  };
-
-  const hasConflictWithWhitelist = (redirectLink: string, whitelistSites: string[]) => {
-    return whitelistSites.every((url: any) => !isStartingStringMatch(url, redirectLink));
-  };
-
-  const hasConflictWithBlocklist = (redirectLink: string, blockListSites: string[]) => {
-    return blockListSites.some((url) => isStartingStringMatch(url, redirectLink));
-  };
-
-  const confirmUrlOperation = (typeText: string) => {
-    return confirm(
-      `Are you sure you want to do this? Don't let your ${typeText} and your redirect url cross streams!`
-    );
-  };
-
-  const updateRedirectLink = (url: string) => {
-    const { siteList, whiteListSites } = dataStorage as any;
-    if (!hasConflictWithWhitelist(url, whiteListSites) && !confirmUrlOperation("whitelist")) return;
-    if (!hasConflictWithBlocklist(url, siteList) && !confirmUrlOperation("black list")) return;
+  const updateRedirectLink = async (url: string) => {
+    await conflictHandler(FieldUpdateEnum.UPDATE_REDIRECT_LINK, url);
     getStorage("settings", (data: any) => {
       const settings = {
         ...data.settings,
         redirectLink: url,
       };
-      setStorage("settings", { settings }, () => {
-        setDataStorage(settings);
-      });
+      setStorage("settings", { settings });
     });
   };
 
@@ -139,9 +139,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     });
   };
 
-  const deleteWhiteListLink = (url: string) => {
-    if (isStartingStringMatch(url, dataStorage?.redirectLink) && !confirmUrlOperation("whitelist"))
-      return;
+  const deleteWhiteListLink = async (url: string) => {
+    await conflictHandler(FieldUpdateEnum.REMOVE_FROM_WHITELIST, url);
     getStorage("settings", (data: any) => {
       let { whiteListSites } = data.settings;
       whiteListSites = whiteListSites.filter((siteURL: string) => siteURL !== url);
@@ -150,11 +149,111 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     });
   };
 
-  const updateRedirectOption = (redirectOption: string) => {
+  const updateRedirectOption = async (redirectOption: string) => {
+    await conflictHandler(FieldUpdateEnum.UPDATE_REDIRECT_OPTION, redirectOption);
     getStorage("settings", (data: any) => {
       let settings = Object.assign({}, data.settings, { redirectOption });
       setStorage("settings", { settings });
     });
+  };
+
+  const isStartingStringMatch = (str1: string, str2: string) => {
+    return str1 && str2 && (str1.indexOf(str2) === 0 || str2.indexOf(str1) === 0);
+  };
+
+  const hasConflictWithWhitelist = (redirectLink: string, whitelistSites: string[]) => {
+    return (
+      redirectLink &&
+      whitelistSites.every((url: string) => !isStartingStringMatch(url, redirectLink))
+    );
+  };
+
+  const hasConflictWithBlocklist = (redirectLink: string, blockListSites: string[]) => {
+    return redirectLink && blockListSites.some((url) => isStartingStringMatch(url, redirectLink));
+  };
+
+  const conflictHandler = async (action: FieldUpdateEnum, value: any) => {
+    const { isBlocking, isWhiteListing, siteList, whiteListSites, redirectLink, redirectOption } =
+      dataStorage;
+    switch (action) {
+      case FieldUpdateEnum.UPDATE_REDIRECT_OPTION: {
+        if (value === RedirectEnum.URL && redirectLink) {
+          if (hasConflictWithWhitelist(redirectLink, whiteListSites) && isWhiteListing) {
+            await addWhiteListSite(redirectLink);
+            // add notification "we added <url> to your whitelist"
+          }
+          if (hasConflictWithBlocklist(redirectLink, siteList) && isBlocking) {
+            alert(
+              `Your redirect website could cause issues. You have ${redirectLink} as your redirect website and that website is also in your block list`
+            );
+          }
+        }
+        break;
+      }
+      case FieldUpdateEnum.UPDATE_REDIRECT_LINK: {
+        if (redirectOption === RedirectEnum.URL) {
+          if (hasConflictWithWhitelist(value, whiteListSites) && isWhiteListing) {
+            await addWhiteListSite(value);
+            // add notification "we added <url> to your whitelist"
+          }
+          if (hasConflictWithBlocklist(value, siteList) && isBlocking) {
+            alert(
+              `Using this redirect website could cause issues. This website is also in your block list`
+            );
+          }
+        }
+        break;
+      }
+      case FieldUpdateEnum.ADD_TO_SITELIST: {
+        if (
+          redirectOption === RedirectEnum.URL &&
+          isStartingStringMatch(value, redirectLink) &&
+          isBlocking
+        ) {
+          alert(
+            `Adding this site could cause issues. You have ${redirectLink} as your redirect website`
+          );
+        }
+        break;
+      }
+      case FieldUpdateEnum.UPDATE_IS_BLOCKING: {
+        if (
+          redirectOption === RedirectEnum.URL &&
+          value &&
+          hasConflictWithBlocklist(redirectLink, siteList)
+        ) {
+          alert(
+            `Activating blocking could cause issues. You have ${redirectLink} as your redirect website and that website is also in your block list`
+          );
+        }
+        break;
+      }
+      case FieldUpdateEnum.UPDATE_IS_WHITELISTING: {
+        if (
+          redirectOption === RedirectEnum.URL &&
+          value &&
+          hasConflictWithWhitelist(redirectLink, whiteListSites)
+        ) {
+          await addWhiteListSite(redirectLink);
+          // add notification "we added <url> to your whitelist"
+        }
+        break;
+      }
+      case FieldUpdateEnum.REMOVE_FROM_WHITELIST: {
+        if (
+          redirectOption === RedirectEnum.URL &&
+          isWhiteListing &&
+          isStartingStringMatch(value, redirectLink)
+        ) {
+          alert(
+            `Removing this from the whitelist could cause issues. You have ${redirectLink} as your redirect website`
+          );
+        }
+        break;
+      }
+      default:
+        return;
+    }
   };
 
   return (
@@ -164,7 +263,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         dataStorage,
         deleteLink,
         deleteWhiteListLink,
-        setFields,
+        setToggles,
         addSite,
         addWhiteListSite,
         updateRedirectLink,

@@ -88,3 +88,19 @@ button {
   line-height: 2em;
   margin: 0 0 10px 0;
 }
+
+ul.site-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-list li {
+  list-style-type: none;
+  display: flex;
+  margin: 3px;
+}
+
+.site-list .fake-link {
+  margin-right: 1px;
+}

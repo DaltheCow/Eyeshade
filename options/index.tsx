@@ -8,7 +8,7 @@ const App = () => {
   const {
     dataStorage,
     isLoaded,
-    setFields,
+    setToggles,
     deleteLink,
     deleteWhiteListLink,
     addSite,
@@ -22,11 +22,6 @@ const App = () => {
   const [site, setSite] = React.useState("");
   const [whiteListSite, setWhiteListSite] = React.useState("");
   const [redirectLinkInput, setRedirectLinkInput] = React.useState("");
-  const [redirectOptionRadio, setRedirectOptionRadio] = React.useState("");
-
-  React.useEffect(() => {
-    setRedirectOptionRadio(redirectOption);
-  }, [redirectOption]);
 
   React.useEffect(() => {
     setRedirectLinkInput(redirectLink);
@@ -51,7 +46,6 @@ const App = () => {
   };
 
   const handleRadioChange = (e: any) => {
-    setRedirectOptionRadio(e.target.value);
     updateRedirectOption(e.target.value);
   };
 
@@ -70,7 +64,7 @@ const App = () => {
                     if (!isBlocking && isWhiteListing) {
                       fields.isWhiteListing = false;
                     }
-                    setFields(fields);
+                    setToggles(fields);
                   }}
                   className={`switcher_slider${isBlocking ? " checked" : ""}`}
                 ></div>
@@ -83,18 +77,11 @@ const App = () => {
                 <div className="switch-show">SHOW</div>
                 <div
                   onClick={() => {
-                    if (
-                      whiteListSites.length === 0 &&
-                      !isWhiteListing &&
-                      !confirm("Are you sure you want to turn this on before adding some sites?")
-                    ) {
-                      return;
-                    }
                     const fields = { isWhiteListing: !isWhiteListing } as any;
                     if (!isWhiteListing && isBlocking) {
                       fields.isBlocking = false;
                     }
-                    setFields(fields);
+                    setToggles(fields);
                   }}
                   className={`switcher_slider${isWhiteListing ? " checked" : ""}`}
                 ></div>
@@ -119,20 +106,20 @@ const App = () => {
                 </form>
               </div>
               <br />
-              <div className="site-list">
+              <ul className="site-list">
                 {siteList.map((url: string) => {
                   return (
-                    <div style={{ display: "flex", margin: "3px" }}>
-                      <a style={{ marginRight: "1px" }} className="fake-link" href="#">
+                    <li>
+                      <a className="fake-link" href="#">
                         https://{url}
                       </a>
                       <div className="icon-container" onClick={() => deleteLink(url)}>
                         <i className="far fa-times-circle"></i>
                       </div>
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
             <div className="content-column">
               <div className="site-input">
@@ -150,20 +137,20 @@ const App = () => {
                 </form>
               </div>
               <br />
-              <div className="site-list">
+              <ul className="site-list">
                 {whiteListSites.map((url: string) => {
                   return (
-                    <div style={{ display: "flex" }}>
+                    <li style={{ display: "flex" }}>
                       <a className="fake-link" href="#">
                         https://{url}
                       </a>
                       <div className="icon-container" onClick={() => deleteWhiteListLink(url)}>
                         <i className="far fa-times-circle"></i>
                       </div>
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
             <div className="content-column">
               <label>
@@ -171,7 +158,7 @@ const App = () => {
                   Redirect Website{" "}
                   <span
                     style={{ cursor: "pointer" }}
-                    title="Your redirect url should:&#013;redirect to a whitelist site when whitelisting;&#013;redirect to a non blacklisted site when blacklisting"
+                    title="Your redirect url should:&#013;redirect to a whitelist site when whitelisting;&#013;redirect to a non blocked site when blocking"
                   >
                     &#9432;
                   </span>
@@ -196,7 +183,7 @@ const App = () => {
                   defaultValue={redirectOption || RedirectEnum.BLANK}
                   name="radio-buttons-group"
                   onChange={handleRadioChange}
-                  value={redirectOptionRadio}
+                  value={redirectOption}
                 >
                   <FormControlLabel value={RedirectEnum.URL} control={<Radio />} label="My URL" />
                   <FormControlLabel

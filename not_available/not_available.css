@@ -31,3 +31,11 @@ body {
   color: #222222;
   font-family: "Cedarville Cursive", cursive;
 }
+
+.quotes-card-content {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}

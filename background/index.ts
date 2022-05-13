@@ -40,53 +40,53 @@ export type Settings = {
     ensureSettings(data, (newData: any) => {
       const { isBlocking, isWhiteListing, siteList, whiteListSites, redirectLink, redirectOption } =
         newData.settings as Settings;
-      // if (isBlocking || isWhiteListing) {
-      //   chrome.tabs.query({}, function (tabs) {
-      //     const sites = isWhiteListing ? whiteListSites : siteList;
-      //     Array.from(tabs).forEach((tab) => {
-      //       blockSites(tab.id, tab.url, sites, isWhiteListing, redirectLink, redirectOption);
-      //     });
-      //   });
-      // }
+      if (isBlocking || isWhiteListing) {
+        chrome.tabs.query({}, function (tabs) {
+          const sites = isWhiteListing ? whiteListSites : siteList;
+          Array.from(tabs).forEach((tab) => {
+            blockSites(tab.id, tab.url, sites, isWhiteListing, redirectLink, redirectOption);
+          });
+        });
+      }
     });
   });
 })();
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-  // getStorage("settings", function (data: any) {
-  //   const { isBlocking, isWhiteListing, siteList, whiteListSites, redirectLink, redirectOption } =
-  //     data.settings;
-  //   if ((isBlocking || isWhiteListing) && changeInfo.url) {
-  //     const sites = isWhiteListing ? whiteListSites : siteList;
-  //     blockSites(tabId, changeInfo.url, sites, isWhiteListing, redirectLink, redirectOption);
-  //   }
-  // });
+  getStorage("settings", function (data: any) {
+    const { isBlocking, isWhiteListing, siteList, whiteListSites, redirectLink, redirectOption } =
+      data.settings;
+    if ((isBlocking || isWhiteListing) && changeInfo.url) {
+      const sites = isWhiteListing ? whiteListSites : siteList;
+      blockSites(tabId, changeInfo.url, sites, isWhiteListing, redirectLink, redirectOption);
+    }
+  });
 });
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
-  // if (changes.settings) {
-  //   const { oldValue, newValue } = changes.settings;
-  //   if (oldValue && newValue) {
-  //     const {
-  //       isBlocking: nIsBlocking,
-  //       siteList: nSiteList,
-  //       isWhiteListing: nIsWhiteListing,
-  //       whiteListSites: nWhiteListSites,
-  //       redirectLink,
-  //       redirectOption,
-  //     } = newValue;
-  //     // TODO in future can make it possible to turn off block sites and then any page would go back to what was originally searched (if I save searched vid per tab prior to blocking said page)
-  //     const blockEnabled = nIsBlocking || nIsWhiteListing;
-  //     if (blockEnabled) {
-  //       chrome.tabs.query({}, function (tabs) {
-  //         const siteList = nIsWhiteListing ? nWhiteListSites : nSiteList;
-  //         Array.from(tabs).forEach((tab) => {
-  //           blockSites(tab.id, tab.url, siteList, nIsWhiteListing, redirectLink, redirectOption);
-  //         });
-  //       });
-  //     }
-  //   }
-  // }
+  if (changes.settings) {
+    const { oldValue, newValue } = changes.settings;
+    if (oldValue && newValue) {
+      const {
+        isBlocking: nIsBlocking,
+        siteList: nSiteList,
+        isWhiteListing: nIsWhiteListing,
+        whiteListSites: nWhiteListSites,
+        redirectLink,
+        redirectOption,
+      } = newValue;
+      // TODO in future can make it possible to turn off block sites and then any page would go back to what was originally searched (if I save searched vid per tab prior to blocking said page)
+      const blockEnabled = nIsBlocking || nIsWhiteListing;
+      if (blockEnabled) {
+        chrome.tabs.query({}, function (tabs) {
+          const siteList = nIsWhiteListing ? nWhiteListSites : nSiteList;
+          Array.from(tabs).forEach((tab) => {
+            blockSites(tab.id, tab.url, siteList, nIsWhiteListing, redirectLink, redirectOption);
+          });
+        });
+      }
+    }
+  }
 });
 
 // never block sites with these terms
