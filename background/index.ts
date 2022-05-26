@@ -3,6 +3,7 @@ import { getStorage, setStorage, getStorageAll } from "../modules/storage";
 export enum RedirectEnum {
   URL = "URL",
   BLANK = "BLANK",
+  DEFAULT = "DEFAULT",
   ENCOURAGING = "ENCOURAGING",
   OFFENSIVE = "OFFENSIVE",
   CUSTOM = "CUSTOM",
@@ -129,7 +130,7 @@ function ensureSettings(data: any, callback: any) {
   siteList = siteList === undefined ? [] : siteList;
   whiteListSites = whiteListSites === undefined ? [] : whiteListSites;
   redirectLink = redirectLink || "";
-  redirectOption = redirectOption || RedirectEnum.BLANK;
+  redirectOption = redirectOption || RedirectEnum.DEFAULT;
   const settings = {
     isBlocking,
     siteList,

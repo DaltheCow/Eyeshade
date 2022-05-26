@@ -187,6 +187,11 @@ const App = () => {
                 >
                   <FormControlLabel value={RedirectEnum.URL} control={<Radio />} label="My URL" />
                   <FormControlLabel
+                    value={RedirectEnum.DEFAULT}
+                    control={<Radio />}
+                    label="Default"
+                  />
+                  <FormControlLabel
                     value={RedirectEnum.BLANK}
                     control={<Radio />}
                     label="Blank Page"

@@ -32,6 +32,11 @@ body {
   font-family: "Cedarville Cursive", cursive;
 }
 
+.quotes-card.default-theme {
+  background: radial-gradient(#414247, #1b1b1d);
+  color: rgb(238, 238, 238);
+}
+
 .quotes-card-content {
   width: 50%;
   display: flex;

@@ -40,7 +40,7 @@ const NotAvailable = () => {
     { title: "Focus", text: "Don't get distracted you piece of doodoo" },
     {
       title: "Why are you reading this?",
-      text: "Your brain so small and unfocused I can't see it. Why don't you get back to work?",
+      text: "Your brain is so small and unfocused I can't see it. Why don't you get back to work?",
     },
     {
       title: "You're losing it",
@@ -50,6 +50,10 @@ const NotAvailable = () => {
       title: "Distracted Dummy",
       text: "I don't have anything else to say, and no I'm not sorry",
     },
+  ] as Tip[];
+
+  const defaultTips = [
+    { title: "You blocked this for a reason :)", text: "No need to get distracted" },
   ] as Tip[];
   let theme = "";
   switch (redirectOption) {
@@ -65,6 +69,10 @@ const NotAvailable = () => {
       theme = "offensive-theme";
       break;
     }
+    case RedirectEnum.DEFAULT:
+      quote = getRandom(defaultTips);
+      theme = "default-theme";
+      break;
     default:
       return <></>;
   }
