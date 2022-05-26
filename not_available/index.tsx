@@ -28,11 +28,11 @@ const NotAvailable = () => {
     },
     {
       title: "Be mindful",
-      text: "Even just reading this and taking a moment to notice your stress can lead you toward better work habits. Always go into your work with fresh intention.",
+      text: "Even just reading this and taking a moment to notice your mental state can lead you toward better work habits. Always go into your work with fresh intention.",
     },
     {
       title: "Right now you're more than enough",
-      text: "Stress is the weight of the past projected into the future. Every time we let the present moment simply exist and accept our stress, we regain the ability to have a better future",
+      text: "Stress is the weight of the past projected into the future. Every time we let the present moment simply exist and accept things we can regain the vision of a brighter future",
     },
   ] as Tip[];
 
