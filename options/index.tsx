@@ -1,8 +1,20 @@
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
+import {
+  Button,
+  createTheme,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Switch,
+  TextField,
+  ThemeProvider,
+} from "@mui/material";
 import * as React from "react";
 import { render } from "react-dom";
 import { useStorageContext, StorageProvider } from "../contexts/storage.context";
 import { RedirectEnum } from "../background/index";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
 const App = () => {
   const {
@@ -58,7 +70,7 @@ const App = () => {
               Block Sites:
               <div className="switch">
                 <div className="switch-show">SHOW</div>
-                <div
+                <Switch
                   onClick={() => {
                     const fields = { isBlocking: !isBlocking } as any;
                     if (!isBlocking && isWhiteListing) {
@@ -66,8 +78,9 @@ const App = () => {
                     }
                     setToggles(fields);
                   }}
-                  className={`switcher_slider${isBlocking ? " checked" : ""}`}
-                ></div>
+                  checked={isBlocking}
+                  color="secondary"
+                />
                 <div className="switch-hide">HIDE</div>
               </div>
             </div>
@@ -75,7 +88,7 @@ const App = () => {
               Whitelist Sites:
               <div className="switch">
                 <div className="switch-show">SHOW</div>
-                <div
+                <Switch
                   onClick={() => {
                     const fields = { isWhiteListing: !isWhiteListing } as any;
                     if (!isWhiteListing && isBlocking) {
@@ -83,8 +96,9 @@ const App = () => {
                     }
                     setToggles(fields);
                   }}
-                  className={`switcher_slider${isWhiteListing ? " checked" : ""}`}
-                ></div>
+                  checked={isWhiteListing}
+                  color="secondary"
+                />
                 <div className="switch-hide">HIDE</div>
               </div>
             </div>
@@ -95,13 +109,21 @@ const App = () => {
                 <form onSubmit={handleSubmitBlockSite}>
                   <label>
                     <h4>Block These Sites</h4>
-                    <input
+                    <TextField
                       placeholder="www.reddit.com"
+                      size="small"
                       type="text"
                       value={site}
                       onChange={(e) => setSite(e.target.value)}
                     />
-                    <button type="submit">+</button>
+                    <Button
+                      style={{ color: "white" }}
+                      color="secondary"
+                      variant="contained"
+                      type="submit"
+                    >
+                      +
+                    </Button>
                   </label>
                 </form>
               </div>
@@ -110,12 +132,12 @@ const App = () => {
                 {siteList.map((url: string) => {
                   return (
                     <li>
+                      <div className="icon-container" onClick={() => deleteLink(url)}>
+                        <DeleteOutlinedIcon />
+                      </div>
                       <a className="fake-link" href="#">
                         https://{url}
                       </a>
-                      <div className="icon-container" onClick={() => deleteLink(url)}>
-                        <i className="far fa-times-circle"></i>
-                      </div>
                     </li>
                   );
                 })}
@@ -126,13 +148,21 @@ const App = () => {
                 <form onSubmit={handleSubmitWhiteListSite}>
                   <label>
                     <h4>Whitelist These Sites</h4>
-                    <input
+                    <TextField
                       placeholder="www.reddit.com"
                       type="text"
+                      size="small"
                       value={whiteListSite}
                       onChange={(e) => setWhiteListSite(e.target.value)}
                     />
-                    <button type="submit">+</button>
+                    <Button
+                      style={{ color: "white" }}
+                      color="secondary"
+                      variant="contained"
+                      type="submit"
+                    >
+                      +
+                    </Button>
                   </label>
                 </form>
               </div>
@@ -141,12 +171,12 @@ const App = () => {
                 {whiteListSites.map((url: string) => {
                   return (
                     <li style={{ display: "flex" }}>
+                      <div className="icon-container" onClick={() => deleteWhiteListLink(url)}>
+                        <DeleteOutlinedIcon />
+                      </div>
                       <a className="fake-link" href="#">
                         https://{url}
                       </a>
-                      <div className="icon-container" onClick={() => deleteWhiteListLink(url)}>
-                        <i className="far fa-times-circle"></i>
-                      </div>
                     </li>
                   );
                 })}
@@ -164,13 +194,21 @@ const App = () => {
                   </span>
                 </h4>
                 <form onSubmit={handleSubmitRedirectLink}>
-                  <input
+                  <TextField
                     placeholder="www.google.com"
                     value={redirectLinkInput}
+                    size="small"
                     type="text"
                     onChange={(e) => setRedirectLinkInput(e.target.value)}
                   />
-                  <button type="submit">+</button>
+                  <Button
+                    style={{ color: "white" }}
+                    color="secondary"
+                    variant="contained"
+                    type="submit"
+                  >
+                    +
+                  </Button>
                 </form>
               </label>
               <br />
@@ -216,11 +254,43 @@ const App = () => {
   );
 };
 
+const theme = createTheme({
+  palette: {
+    secondary: {
+      main: "#1ebc8e",
+    },
+  },
+  components: {
+    MuiSwitch: {
+      styleOverrides: {
+        switchBase: {
+          color: "white !important",
+        },
+        thumb: {
+          height: 12,
+          width: 12,
+          marginTop: "7px",
+          marginLeft: "7px",
+        },
+        track: {
+          height: "20px",
+          minWidth: "40px",
+          borderRadius: "10px",
+          backgroundColor: "#f16132",
+          opacity: "1 !important",
+        },
+      },
+    },
+  },
+});
+
 const AppWrapper = () => {
   return (
-    <StorageProvider>
-      <App />
-    </StorageProvider>
+    <ThemeProvider theme={theme}>
+      <StorageProvider>
+        <App />
+      </StorageProvider>
+    </ThemeProvider>
   );
 };
 

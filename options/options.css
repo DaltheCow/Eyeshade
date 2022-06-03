@@ -14,38 +14,6 @@ body {
   min-width: 166px;
 }
 
-.switcher_slider {
-  display: flex;
-  align-items: center;
-  width: 40px;
-  height: 20px;
-  min-width: 40px;
-  border-radius: 29px;
-  background-color: #f16132;
-  cursor: pointer;
-  transition: background-color 0.5s;
-}
-
-.switcher_slider.checked {
-  background-color: #1ebc8e;
-}
-
-.switcher_slider:before {
-  display: block;
-  content: "";
-  width: 12px;
-  height: 12px;
-  background-color: #fff;
-  border-radius: 12px;
-  position: relative;
-  left: calc(0% + 5px);
-  transition: left 0.5s;
-}
-
-.switcher_slider.checked:before {
-  left: calc(100% - 17px);
-}
-
 .switch {
   width: 120px;
   display: flex;
@@ -80,6 +48,11 @@ body {
   cursor: pointer;
 }
 
+.icon-container svg {
+  cursor: pointer;
+  font-size: 18px;
+}
+
 button {
   cursor: pointer;
 }
@@ -98,9 +71,9 @@ ul.site-list {
 .site-list li {
   list-style-type: none;
   display: flex;
-  margin: 3px;
+  margin: 3px 3px 3px 0;
 }
 
 .site-list .fake-link {
-  margin-right: 1px;
+  margin-left: 1px;
 }

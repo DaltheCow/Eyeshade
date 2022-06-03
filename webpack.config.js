@@ -1,6 +1,9 @@
 const { resolve } = require("path");
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-module.exports = {
+const smp = new SpeedMeasurePlugin();
+
+module.exports = smp.wrap({
   devtool: "inline-source-map",
   entry: {
     popup: "./popup/index.tsx",
@@ -24,4 +27,4 @@ module.exports = {
       },
     ],
   },
-};
+});

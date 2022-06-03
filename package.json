@@ -6,6 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "husky": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "**/*.ts": "tsc-files --noEmit"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,9 +21,11 @@
     "@babel/preset-react": "^7.9.4",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.7.0",
     "@types/chrome": "^0.0.184",
     "babel-loader": "^8.1.0",
+    "husky-tslint-pre-commit": "^1.0.3",
     "loader-utils": "^3.2.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
@@ -34,6 +42,10 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-react-hmre": "^1.1.1",
+    "husky": "^4.3.8",
+    "lint-staged": "^13.0.0",
+    "speed-measure-webpack-plugin": "^1.5.0",
+    "tsc-files": "^1.1.3",
     "webpack": "^4.5.0"
   }
 }
