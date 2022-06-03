@@ -6,6 +6,7 @@ const smp = new SpeedMeasurePlugin();
 
 module.exports = smp.wrap({
   mode: "development",
+  context: __dirname,
   devtool: "inline-source-map",
   entry: {
     popup: "./popup/index.tsx",
@@ -24,7 +25,7 @@ module.exports = smp.wrap({
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
         exclude: /node_modules/,
       },
     ],
