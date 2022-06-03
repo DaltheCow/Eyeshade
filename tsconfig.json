@@ -14,13 +14,6 @@
       "*": ["node_modules/*", "*"]
     }
   },
-  "files": [
-    "./background/*",
-    "./not_available/*",
-    "./options/*",
-    "./popup/*",
-    "./contexts/*",
-    "./modules/*"
-  ],
+  "include": ["**/*"],
   "exclude": ["node_modules"]
 }

@@ -44,7 +44,8 @@ const App = () => {
   const [whiteListSite, setWhiteListSite] = React.useState("");
   const [redirectLinkInput, setRedirectLinkInput] = React.useState("");
 
-  const test: number = "aa";
+  const test: number = "afdsaa";
+  console.log("🚀 ~ file: index.tsx ~ line 48 ~ App ~ test", test);
 
   React.useEffect(() => {
     setRedirectLinkInput(redirectLink);
