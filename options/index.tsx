@@ -45,6 +45,9 @@ const App = () => {
   const [redirectLinkInput, setRedirectLinkInput] = React.useState("");
 
   const test: number = "afdsaa";
+  const thing = (ds) => {
+    console.log(ds);
+  };
   console.log("🚀 ~ file: index.tsx ~ line 48 ~ App ~ test", test);
 
   React.useEffect(() => {
