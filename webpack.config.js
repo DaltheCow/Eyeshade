@@ -1,9 +1,11 @@
 const { resolve } = require("path");
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 const smp = new SpeedMeasurePlugin();
 
 module.exports = smp.wrap({
+  mode: "development",
   devtool: "inline-source-map",
   entry: {
     popup: "./popup/index.tsx",
@@ -27,4 +29,5 @@ module.exports = smp.wrap({
       },
     ],
   },
+  plugins: [new ForkTsCheckerWebpackPlugin()],
 });
