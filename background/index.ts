@@ -43,9 +43,11 @@ export type Settings = {
         newData.settings as Settings;
       if (isBlocking || isWhiteListing) {
         chrome.tabs.query({}, function (tabs) {
-          const sites = isWhiteListing ? whiteListSites : siteList;
+          const sites = (isWhiteListing ? whiteListSites : siteList) || [];
           Array.from(tabs).forEach((tab) => {
-            blockSites(tab.id, tab.url, sites, isWhiteListing, redirectLink, redirectOption);
+            if (tab.url) {
+              blockSites(tab.id, tab.url, sites, isWhiteListing, redirectLink, redirectOption);
+            }
           });
         });
       }
@@ -82,7 +84,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         chrome.tabs.query({}, function (tabs) {
           const siteList = nIsWhiteListing ? nWhiteListSites : nSiteList;
           Array.from(tabs).forEach((tab) => {
-            blockSites(tab.id, tab.url, siteList, nIsWhiteListing, redirectLink, redirectOption);
+            if (tab.url) {
+              blockSites(tab.id, tab.url, siteList, nIsWhiteListing, redirectLink, redirectOption);
+            }
           });
         });
       }
@@ -101,8 +105,8 @@ function blockSites(
   url: string,
   siteList: string[],
   isWhitelist = false,
-  redirectLink: string,
-  redirectOption: RedirectEnum
+  redirectLink: string | undefined,
+  redirectOption = RedirectEnum.BLANK
 ) {
   if (ignoreSite(url)) return;
   const isInList = siteList.find((site) => {
@@ -120,7 +124,7 @@ function blockSites(
 }
 
 function ensureSettings(data: any, callback: any) {
-  let prevSettings = data.settings || {};
+  const prevSettings = data.settings || {};
 
   let { isBlocking, siteList, isWhiteListing, whiteListSites, redirectLink, redirectOption } =
     prevSettings;

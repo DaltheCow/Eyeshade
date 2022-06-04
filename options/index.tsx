@@ -1,15 +1,3 @@
-// import {
-//   Button,
-//   createTheme,
-//   FormControl,
-//   FormControlLabel,
-//   FormLabel,
-//   Radio,
-//   RadioGroup,
-//   Switch,
-//   TextField,
-//   ThemeProvider,
-// } from "@mui/material";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -44,14 +32,10 @@ const App = () => {
   const [whiteListSite, setWhiteListSite] = React.useState("");
   const [redirectLinkInput, setRedirectLinkInput] = React.useState("");
 
-  const test: number = "afdsaa";
-  const thing = (ds) => {
-    console.log(ds, ds);
-  };
-  console.log("🚀 ~ file: index.tsx ~ line 48 ~ App ~ test", test);
-
   React.useEffect(() => {
-    setRedirectLinkInput(redirectLink);
+    if (redirectLink) {
+      setRedirectLinkInput(redirectLink);
+    }
   }, [redirectLink]);
   if (!isLoaded) return <></>;
 
@@ -129,10 +113,11 @@ const App = () => {
                       size="small"
                       type="text"
                       value={site}
+                      variant="outlined"
                       onChange={(e) => setSite(e.target.value)}
                     />
                     <Button
-                      style={{ color: "white" }}
+                      style={{ color: "white", marginLeft: "5px" }}
                       color="secondary"
                       variant="contained"
                       type="submit"
@@ -144,7 +129,7 @@ const App = () => {
               </div>
               <br />
               <ul className="site-list">
-                {siteList.map((url: string) => {
+                {siteList?.map((url: string) => {
                   return (
                     <li>
                       <div className="icon-container" onClick={() => deleteLink(url)}>
@@ -171,7 +156,7 @@ const App = () => {
                       onChange={(e) => setWhiteListSite(e.target.value)}
                     />
                     <Button
-                      style={{ color: "white" }}
+                      style={{ color: "white", marginLeft: "5px" }}
                       color="secondary"
                       variant="contained"
                       type="submit"
@@ -183,7 +168,7 @@ const App = () => {
               </div>
               <br />
               <ul className="site-list">
-                {whiteListSites.map((url: string) => {
+                {whiteListSites?.map((url: string) => {
                   return (
                     <li style={{ display: "flex" }}>
                       <div className="icon-container" onClick={() => deleteWhiteListLink(url)}>
@@ -217,7 +202,7 @@ const App = () => {
                     onChange={(e) => setRedirectLinkInput(e.target.value)}
                   />
                   <Button
-                    style={{ color: "white" }}
+                    style={{ color: "white", marginLeft: "5px" }}
                     color="secondary"
                     variant="contained"
                     type="submit"
@@ -293,6 +278,24 @@ const theme = createTheme({
           borderRadius: "10px",
           backgroundColor: "#f16132",
           opacity: "1 !important",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        sizeMedium: {
+          maxWidth: "40px",
+          minWidth: "40px",
+          maxHeight: "38px",
+          minHeight: "38px",
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        sizeSmall: {
+          maxWidth: "225px",
+          width: "225px",
         },
       },
     },

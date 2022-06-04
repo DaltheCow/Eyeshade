@@ -71,9 +71,17 @@ ul.site-list {
 .site-list li {
   list-style-type: none;
   display: flex;
-  margin: 3px 3px 3px 0;
+  align-items: center;
+  margin: 3px 3px 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  min-width: 269px;
+  width: 270px;
+  min-height: 40px;
 }
 
 .site-list .fake-link {
-  margin-left: 1px;
+  margin-left: 15px;
 }

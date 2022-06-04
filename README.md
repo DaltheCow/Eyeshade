@@ -1,2 +1,3 @@
 # eyeshade
-An extension to help keep you from getting distracted
+
+An extension to help those with a distracted mind
