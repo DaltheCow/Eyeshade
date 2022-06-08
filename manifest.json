@@ -29,7 +29,7 @@
   ],
   "options_page": "options/options.html",
 
-  "permissions": ["storage", "tabs", "webNavigation"],
+  "permissions": ["storage", "tabs"],
   "icons": {
     "16": "Eyeshade.png",
     "48": "Eyeshade.png",
