@@ -102,7 +102,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
       if (!timer && oldValue.timer) chrome.alarms.clearAll();
       if (timer && timer !== oldValue.timer) {
         chrome.alarms.clearAll();
-
+        console.log("created timer");
         chrome.alarms.create({ delayInMinutes: Math.round((timer - Date.now()) / 1000 / 60) });
       }
       const blockEnabled = nIsBlocking || nIsWhiteListing;

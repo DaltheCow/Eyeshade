@@ -310,7 +310,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         ...data.settings,
         ...updates,
       };
-      setStorage("settings", { settings });
+      return setStorage("settings", { settings });
     });
   };
 

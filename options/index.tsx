@@ -16,7 +16,6 @@ import Snackbar from "@mui/material/Snackbar";
 123456;
 function formatTimer(ms: number) {
   const hours = Math.floor(ms / (1000 * 60 * 60));
-  console.log("🚀 ~ file: index.tsx ~ line 19 ~ formatTimer ~ hours", hours);
   const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((ms % (1000 * 60)) / 1000);
   if (minutes <= 0 && seconds <= 0) return "0";
