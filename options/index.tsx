@@ -187,22 +187,24 @@ const App = () => {
                   <div>{formatTimer(countdown || 0)}</div>
                 </div>
               ) : (
-                <div style={{ display: "flex", marginTop: "12px" }}>
-                  <TextField
-                    size="small"
-                    type="number"
-                    value={timerHours}
-                    onChange={(e) => setTimerHours(preventNegative(Number(e.target.value)))}
-                  />
-                  <span style={{ fontSize: "28px" }}>:</span>
-                  <TextField
-                    size="small"
-                    type="number"
-                    value={timerMinutes}
-                    onChange={(e) => setTimerMinutes(preventNegative(Number(e.target.value)))}
-                  />
+                <div style={{ marginTop: "12px" }}>
+                  <div style={{ display: "inline-flex", marginRight: "5px", marginBottom: "5px" }}>
+                    <TextField
+                      size="small"
+                      type="number"
+                      value={timerHours}
+                      onChange={(e) => setTimerHours(preventNegative(Number(e.target.value)))}
+                    />
+                    <span style={{ fontSize: "28px" }}>:</span>
+                    <TextField
+                      size="small"
+                      type="number"
+                      value={timerMinutes}
+                      onChange={(e) => setTimerMinutes(preventNegative(Number(e.target.value)))}
+                    />
+                  </div>
                   <Button
-                    style={{ color: "white", marginLeft: "5px" }}
+                    style={{ color: "white", marginBottom: "4px" }}
                     color="secondary"
                     variant="contained"
                     onClick={startTimer}

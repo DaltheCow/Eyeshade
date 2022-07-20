@@ -92,6 +92,11 @@ ul.site-list {
   width: 70px;
 }
 
+.control-container .MuiButton-root.MuiButton-sizeMedium {
+  max-height: 40px;
+  min-height: 40px;
+}
+
 .main-content .MuiButton-root.MuiButton-sizeMedium {
   max-width: 40px;
   min-width: 40px;

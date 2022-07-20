@@ -52,7 +52,7 @@ const NotAvailable = () => {
     },
     {
       title: "Don't be grass",
-      text: "Once upon a time there was a blade of grass that move wherever the wind pushed it. That blade of grass is your brain and you have no focus",
+      text: "Once upon a time there was a blade of grass that moved wherever the wind pushed it. That blade of grass is your brain and you have no focus",
     },
   ] as Tip[];
 
