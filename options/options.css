@@ -2,13 +2,13 @@ body {
   margin: 0;
 }
 
-.main-content {
+.container {
   display: grid;
   grid-template-columns: minmax(166px, 17%) 1fr;
   height: 100vh;
 }
 
-.switch-list-container {
+.control-list-container {
   background: #3f414a;
   color: #eaeaea;
   min-width: 166px;
@@ -21,7 +21,7 @@ body {
   justify-content: space-between;
 }
 
-.switch-container {
+.control-container {
   margin: 20px;
 }
 
@@ -84,4 +84,20 @@ ul.site-list {
 
 .site-list .fake-link {
   margin-left: 15px;
+}
+
+.control-container .MuiOutlinedInput-root {
+  background: #eee;
+  max-width: 100px;
+  width: 70px;
+}
+
+.main-content .MuiButton-root.MuiButton-sizeMedium {
+  max-width: 40px;
+  min-width: 40px;
+}
+
+.main-content .MuiInputBase-root.MuiInputBase-sizeSmall {
+  max-width: 225px;
+  width: 225px;
 }

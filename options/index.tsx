@@ -12,6 +12,18 @@ import { render } from "react-dom";
 import { useStorageContext, StorageProvider } from "../contexts/storage.context";
 import { RedirectEnum } from "../background/index";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import Snackbar from "@mui/material/Snackbar";
+123456;
+function formatTimer(ms: number) {
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+  console.log("🚀 ~ file: index.tsx ~ line 19 ~ formatTimer ~ hours", hours);
+  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+  if (minutes <= 0 && seconds <= 0) return "0";
+  return `${hours ? hours + ":" : ""}${!minutes && hours ? "00:" : ""}${
+    minutes ? minutes + ":" : ""
+  }${seconds < 10 ? "0" : ""}${seconds}`;
+}
 
 const App = () => {
   const {
@@ -24,19 +36,57 @@ const App = () => {
     addWhiteListSite,
     updateRedirectLink,
     updateRedirectOption,
+    setTimer,
   } = useStorageContext();
-  const { siteList, isBlocking, whiteListSites, isWhiteListing, redirectLink, redirectOption } =
-    dataStorage;
+  const {
+    siteList,
+    isBlocking,
+    whiteListSites,
+    isWhiteListing,
+    redirectLink,
+    redirectOption,
+    timer,
+    savedMinutes,
+    savedHours,
+  } = dataStorage;
+  // pull minutes, hours from dataStorage
 
   const [site, setSite] = React.useState("");
   const [whiteListSite, setWhiteListSite] = React.useState("");
   const [redirectLinkInput, setRedirectLinkInput] = React.useState("");
+  const [countdown, setCountdown] = React.useState<number | null>(null);
+  const [intervalId, setIntervalId] = React.useState<ReturnType<typeof setInterval> | null>(null);
+  const [timerMinutes, setTimerMinutes] = React.useState(savedMinutes || 0);
+  const [timerHours, setTimerHours] = React.useState(savedHours || 0);
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (redirectLink) {
       setRedirectLinkInput(redirectLink);
     }
   }, [redirectLink]);
+
+  React.useEffect(() => {
+    if ((savedMinutes || savedHours) && timerMinutes === 0 && timerHours === 0) {
+      setTimerMinutes(savedMinutes);
+      setTimerHours(savedHours);
+    }
+  }, [savedMinutes, savedHours]);
+
+  React.useEffect(() => {
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+    if (timer) {
+      const intvl = setInterval(() => {
+        setCountdown(timer - Date.now());
+      }, 100);
+      setIntervalId(intvl);
+
+      return () => clearInterval(intvl);
+    }
+  }, [timer]);
+
   if (!isLoaded) return <></>;
 
   const handleSubmitBlockSite = (e: any) => {
@@ -60,12 +110,27 @@ const App = () => {
     updateRedirectOption(e.target.value);
   };
 
+  const startTimer = async () => {
+    const res = await setTimer(
+      Date.now() + 1000 * 60 * timerMinutes + 1000 * 60 * 60 * timerHours,
+      timerMinutes,
+      timerHours
+    );
+    if (res) {
+      setOpen(true);
+    }
+  };
+
+  function preventNegative(num: number) {
+    return num < 0 ? 0 : num;
+  }
+
   return (
     <div>
       {isLoaded && (
-        <div className="main-content">
-          <div className="switch-list-container">
-            <div className="switch-container">
+        <div className="container">
+          <div className="control-list-container">
+            <div className="control-container">
               Block Sites:
               <div className="switch">
                 <div className="switch-show">SHOW</div>
@@ -83,7 +148,7 @@ const App = () => {
                 <div className="switch-hide">HIDE</div>
               </div>
             </div>
-            <div className="switch-container">
+            <div className="control-container">
               Whitelist Sites:
               <div className="switch">
                 <div className="switch-show">SHOW</div>
@@ -101,8 +166,55 @@ const App = () => {
                 <div className="switch-hide">HIDE</div>
               </div>
             </div>
+            <div className="control-container">
+              Timer (hrs:mins):
+              {timer ? (
+                <div
+                  style={{
+                    display: "flex",
+                    marginTop: "12px",
+                    fontSize: "24px",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button
+                    style={{ color: "white", marginRight: "5px" }}
+                    color="secondary"
+                    variant="contained"
+                    onClick={() => setTimer(null, undefined, undefined)}
+                  >
+                    Stop
+                  </Button>
+                  <div>{formatTimer(countdown || 0)}</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", marginTop: "12px" }}>
+                  <TextField
+                    size="small"
+                    type="number"
+                    value={timerHours}
+                    onChange={(e) => setTimerHours(preventNegative(Number(e.target.value)))}
+                  />
+                  <span style={{ fontSize: "28px" }}>:</span>
+                  <TextField
+                    size="small"
+                    type="number"
+                    value={timerMinutes}
+                    onChange={(e) => setTimerMinutes(preventNegative(Number(e.target.value)))}
+                  />
+                  <Button
+                    style={{ color: "white", marginLeft: "5px" }}
+                    color="secondary"
+                    variant="contained"
+                    onClick={startTimer}
+                  >
+                    Start
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-          <div style={{ display: "flex" }}>
+          <div className="main-content" style={{ display: "flex" }}>
             <div className="content-column">
               <div className="site-input">
                 <form onSubmit={handleSubmitBlockSite}>
@@ -131,7 +243,7 @@ const App = () => {
               <ul className="site-list">
                 {siteList?.map((url: string) => {
                   return (
-                    <li>
+                    <li key={url}>
                       <div className="icon-container" onClick={() => deleteLink(url)}>
                         <DeleteOutlinedIcon />
                       </div>
@@ -170,7 +282,7 @@ const App = () => {
               <ul className="site-list">
                 {whiteListSites?.map((url: string) => {
                   return (
-                    <li style={{ display: "flex" }}>
+                    <li key={url} style={{ display: "flex" }}>
                       <div className="icon-container" onClick={() => deleteWhiteListLink(url)}>
                         <DeleteOutlinedIcon />
                       </div>
@@ -250,6 +362,14 @@ const App = () => {
           </div>
         </div>
       )}
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={() => setOpen(false)}
+        message={`${isBlocking ? "Blocking" : "White Listing"} will turn off in ${formatTimer(
+          countdown || 0
+        )}`}
+      />
     </div>
   );
 };
@@ -284,21 +404,19 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         sizeMedium: {
-          maxWidth: "40px",
-          minWidth: "40px",
           maxHeight: "38px",
           minHeight: "38px",
         },
       },
     },
-    MuiInputBase: {
-      styleOverrides: {
-        sizeSmall: {
-          maxWidth: "225px",
-          width: "225px",
-        },
-      },
-    },
+    // MuiInputBase: {
+    //   styleOverrides: {
+    //     sizeSmall: {
+    //       maxWidth: "225px",
+    //       width: "225px",
+    //     },
+    //   },
+    // },
   },
 });
 

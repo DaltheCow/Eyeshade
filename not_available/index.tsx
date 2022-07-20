@@ -50,6 +50,10 @@ const NotAvailable = () => {
       title: "Distracted Dummy",
       text: "I don't have anything else to say, and no I'm not sorry",
     },
+    {
+      title: "Don't be grass",
+      text: "Once upon a time there was a blade of grass that move wherever the wind pushed it. That blade of grass is your brain and you have no focus",
+    },
   ] as Tip[];
 
   const defaultTips = [

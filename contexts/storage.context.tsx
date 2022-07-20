@@ -24,6 +24,8 @@ const Context = React.createContext({
   updateRedirectOption: (redirectOption: string) => {
     //nothing
   },
+  setTimer: async (timer: number | null, timerMinutes?: number, timerHours?: number) =>
+    new Promise(() => Promise.resolve()),
 });
 
 type StorageContextProps = {
@@ -46,8 +48,17 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
   React.useEffect(() => {
     getStorageAll(["settings"]).then((data) => {
       const { settings } = data as any;
-      const { isBlocking, siteList, isWhiteListing, whiteListSites, redirectLink, redirectOption } =
-        settings;
+      const {
+        isBlocking,
+        siteList,
+        isWhiteListing,
+        whiteListSites,
+        redirectLink,
+        redirectOption,
+        timer,
+        savedMinutes,
+        savedHours,
+      } = settings;
       setDataStorage({
         isBlocking,
         siteList,
@@ -55,6 +66,9 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         whiteListSites,
         redirectLink,
         redirectOption,
+        timer,
+        savedMinutes,
+        savedHours,
       });
       setIsLoaded(true);
     });
@@ -71,11 +85,18 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
           "whiteListSites",
           "redirectLink",
           "redirectOption",
+          "timer",
+          "savedMinutes",
+          "savedHours",
         ];
         while (JSON.stringify(oldValue[fields[0]]) === JSON.stringify(newValue[fields[0]])) {
           fields.shift();
         }
-        setDataStorage({ ...dataStorage, [fields[0]]: newValue[fields[0]] });
+        const updates = {} as any;
+        fields.forEach((field) => {
+          updates[field] = newValue[field];
+        });
+        setDataStorage({ ...dataStorage, ...updates });
       }
     };
     chrome.storage.onChanged.addListener(listenerFunc);
@@ -95,7 +116,6 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     }
     getStorage("settings", (data: any) => {
       const settings = { ...data.settings, ...fields };
-      console.log("🚀 ~ file: storage.context.tsx ~ line 87 ~ getStorage ~ settings", settings);
       setStorage("settings", { settings }, () => {
         setDataStorage(settings);
       });
@@ -274,23 +294,53 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     }
   };
 
-  return (
-    <Context.Provider
-      value={{
-        isLoaded,
-        dataStorage,
-        deleteLink,
-        deleteWhiteListLink,
-        setToggles,
-        addSite,
-        addWhiteListSite,
-        updateRedirectLink,
-        updateRedirectOption,
-      }}
-    >
-      {children}
-    </Context.Provider>
-  );
+  const setTimer = async (timer: number | null, timerMinutes?: number, timerHours?: number) => {
+    const { isBlocking, isWhiteListing } = dataStorage;
+    if (!isBlocking && !isWhiteListing) {
+      alert("You must have blocking or white listing on to use the timer");
+      return;
+    }
+    return getStorage("settings", (data: any) => {
+      const updates = { timer } as any;
+      if (timerMinutes || timerHours) {
+        updates.savedMinutes = timerMinutes;
+        updates.savedHours = timerHours;
+      }
+      const settings = {
+        ...data.settings,
+        ...updates,
+      };
+      setStorage("settings", { settings });
+    });
+  };
+
+  const values = React.useMemo(() => {
+    return {
+      isLoaded,
+      dataStorage,
+      deleteLink,
+      deleteWhiteListLink,
+      setToggles,
+      addSite,
+      addWhiteListSite,
+      updateRedirectLink,
+      updateRedirectOption,
+      setTimer,
+    };
+  }, [
+    isLoaded,
+    dataStorage,
+    deleteLink,
+    deleteWhiteListLink,
+    setToggles,
+    addSite,
+    addWhiteListSite,
+    updateRedirectLink,
+    updateRedirectOption,
+    setTimer,
+  ]);
+
+  return <Context.Provider value={values}>{children}</Context.Provider>;
 };
 
 export const useStorageContext = () => {

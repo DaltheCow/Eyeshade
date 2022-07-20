@@ -34,6 +34,9 @@ export type Settings = {
   redirectLink?: string;
   redirectOption?: RedirectEnum;
   tipSettings?: TipSettings;
+  timer?: number | null;
+  savedMinutes: number;
+  savedHours: number;
 };
 
 (function () {
@@ -66,6 +69,15 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
   });
 });
 
+chrome.alarms.onAlarm.addListener(() => {
+  getStorage("settings", (data: any) => {
+    const { settings } = data;
+    setStorage("settings", {
+      settings: { ...settings, timer: null, isBlocking: false, isWhiteListing: false },
+    });
+  });
+});
+
 chrome.storage.onChanged.addListener(function (changes, namespace) {
   if (changes.settings) {
     const { oldValue, newValue } = changes.settings;
@@ -77,8 +89,22 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         whiteListSites: nWhiteListSites,
         redirectLink,
         redirectOption,
+        timer,
       } = newValue;
-      // TODO in future can make it possible to turn off block sites and then any page would go back to what was originally searched (if I save searched vid per tab prior to blocking said page)
+      // TODO in future can make it possible to turn off block sites and then any page would go back to what was originally searched (if I save searched vid per tab prior to blocking said page). currently blocking it seems to overwrite the page in history
+      const blockingWasDisabled =
+        (nIsBlocking !== oldValue.isBlocking && !nIsBlocking) ||
+        (nIsWhiteListing !== oldValue.isWhiteListing && !nIsWhiteListing);
+      if (timer && blockingWasDisabled) {
+        chrome.alarms.clearAll();
+        setStorage("settings", { settings: { ...newValue, timer: null } });
+      }
+      if (!timer && oldValue.timer) chrome.alarms.clearAll();
+      if (timer && timer !== oldValue.timer) {
+        chrome.alarms.clearAll();
+
+        chrome.alarms.create({ delayInMinutes: Math.round((timer - Date.now()) / 1000 / 60) });
+      }
       const blockEnabled = nIsBlocking || nIsWhiteListing;
       if (blockEnabled) {
         chrome.tabs.query({}, function (tabs) {
@@ -126,8 +152,17 @@ function blockSites(
 function ensureSettings(data: any, callback: any) {
   const prevSettings = data.settings || {};
 
-  let { isBlocking, siteList, isWhiteListing, whiteListSites, redirectLink, redirectOption } =
-    prevSettings;
+  let {
+    isBlocking,
+    siteList,
+    isWhiteListing,
+    whiteListSites,
+    redirectLink,
+    redirectOption,
+    timer,
+    savedMinutes,
+    savedHours,
+  } = prevSettings;
 
   isBlocking = Boolean(isBlocking);
   isWhiteListing = Boolean(isWhiteListing);
@@ -135,6 +170,9 @@ function ensureSettings(data: any, callback: any) {
   whiteListSites = whiteListSites === undefined ? [] : whiteListSites;
   redirectLink = redirectLink || "";
   redirectOption = redirectOption || RedirectEnum.DEFAULT;
+  timer ||= null;
+  savedMinutes ||= 0;
+  savedHours ||= 0;
   const settings = {
     isBlocking,
     siteList,
@@ -142,6 +180,9 @@ function ensureSettings(data: any, callback: any) {
     whiteListSites,
     redirectLink,
     redirectOption,
+    timer,
+    savedMinutes,
+    savedHours,
   };
   //update storage use to new set function
   let newData = {};
