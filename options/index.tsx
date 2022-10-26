@@ -60,6 +60,7 @@ const App = () => {
   const [timerMinutes, setTimerMinutes] = React.useState(savedMinutes || 0);
   const [timerHours, setTimerHours] = React.useState(savedHours || 0);
   const [open, setOpen] = React.useState(false);
+  const [shouldAlertSaved, setShouldAlertSaved] = React.useState(false);
 
   React.useEffect(() => {
     if (redirectLink) {
@@ -104,7 +105,9 @@ const App = () => {
 
   const handleSubmitRedirectLink = (e: any) => {
     e.preventDefault();
-    updateRedirectLink(redirectLinkInput);
+    updateRedirectLink(redirectLinkInput).then(() => {
+      setShouldAlertSaved(true);
+    });
   };
 
   const handleRadioChange = (e: any) => {
@@ -380,6 +383,12 @@ const App = () => {
         message={`${isBlocking ? "Blocking" : "White Listing"} will turn off in ${formatTimer(
           countdown || 0
         )}`}
+      />
+      <Snackbar
+        open={shouldAlertSaved}
+        autoHideDuration={2000}
+        onClose={() => setShouldAlertSaved(false)}
+        message={"redirect saved"}
       />
     </div>
   );

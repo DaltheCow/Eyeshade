@@ -184,9 +184,7 @@ function blockSites(
     // can I push the current url onto history so it isn't lost before redirect?
     const url =
       redirectOption === RedirectEnum.URL && redirectLink
-        ? isHttps
-          ? "https://"
-          : "http://" + redirectLink
+        ? (isHttps ? "https://" : "http://") + redirectLink
         : "not_available/not_available.html";
     chrome.tabs.update(tabId, { url });
   }
@@ -228,6 +226,7 @@ function ensureSettings(data: any, callback: any) {
     timer,
     savedMinutes,
     savedHours,
+    isHttps,
   };
   //update storage use to new set function
   let newData = {};
