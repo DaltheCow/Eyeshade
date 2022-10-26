@@ -315,8 +315,11 @@ const App = () => {
                     onSubmit={handleSubmitRedirectLink}
                   >
                     <div
-                      onClick={() => toggleHttps(!isHttps)}
-                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        toggleHttps(!isHttps);
+                        setShouldAlertSaved(true);
+                      }}
+                      style={{ cursor: "pointer", fontSize: "16px", fontFamily: "Helvetica" }}
                       className="padded-box"
                     >
                       {isHttps ? "https://" : "http://"}
