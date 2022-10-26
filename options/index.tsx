@@ -36,6 +36,7 @@ const App = () => {
     updateRedirectLink,
     updateRedirectOption,
     setTimer,
+    toggleHttps,
   } = useStorageContext();
   const {
     siteList,
@@ -47,6 +48,7 @@ const App = () => {
     timer,
     savedMinutes,
     savedHours,
+    isHttps,
   } = dataStorage;
   // pull minutes, hours from dataStorage
 
@@ -240,8 +242,7 @@ const App = () => {
                   </label>
                 </form>
               </div>
-              <br />
-              <ul className="site-list">
+              <ul style={{ marginTop: "15px" }} className="site-list">
                 {siteList?.map((url: string) => {
                   return (
                     <li key={url}>
@@ -279,8 +280,7 @@ const App = () => {
                   </label>
                 </form>
               </div>
-              <br />
-              <ul className="site-list">
+              <ul style={{ marginTop: "15px" }} className="site-list">
                 {whiteListSites?.map((url: string) => {
                   return (
                     <li key={url} style={{ display: "flex" }}>
@@ -295,70 +295,80 @@ const App = () => {
                 })}
               </ul>
             </div>
-            <div className="content-column">
-              <label>
-                <h4>
-                  Redirect Website{" "}
-                  <span
-                    style={{ cursor: "pointer" }}
-                    title="Your redirect url should:&#013;redirect to a whitelist site when whitelisting;&#013;redirect to a non blocked site when blocking"
+            <div>
+              <div className="content-column">
+                <label>
+                  <h4>
+                    Redirect Website{" "}
+                    <span
+                      style={{ cursor: "pointer" }}
+                      title="Your redirect url should:&#013;redirect to a whitelist site when whitelisting;&#013;redirect to a non blocked site when blocking"
+                    >
+                      &#9432;
+                    </span>
+                  </h4>
+                  <form
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                    onSubmit={handleSubmitRedirectLink}
                   >
-                    &#9432;
-                  </span>
-                </h4>
-                <form onSubmit={handleSubmitRedirectLink}>
-                  <TextField
-                    placeholder="www.google.com"
-                    value={redirectLinkInput}
-                    size="small"
-                    type="text"
-                    onChange={(e) => setRedirectLinkInput(e.target.value)}
-                  />
-                  <Button
-                    style={{ color: "white", marginLeft: "5px" }}
-                    color="secondary"
-                    variant="contained"
-                    type="submit"
+                    <div
+                      onClick={() => toggleHttps(!isHttps)}
+                      style={{ cursor: "pointer" }}
+                      className="padded-box"
+                    >
+                      {isHttps ? "https://" : "http://"}
+                    </div>
+                    <TextField
+                      placeholder="www.google.com"
+                      value={redirectLinkInput}
+                      size="small"
+                      type="text"
+                      onChange={(e) => setRedirectLinkInput(e.target.value)}
+                    />
+                    <Button
+                      style={{ color: "white", marginLeft: "5px" }}
+                      color="secondary"
+                      variant="contained"
+                      type="submit"
+                    >
+                      +
+                    </Button>
+                  </form>
+                </label>
+              </div>
+              <div style={{ marginTop: "15px" }} className="content-column">
+                <FormControl>
+                  <FormLabel>Redirect</FormLabel>
+                  <RadioGroup
+                    defaultValue={redirectOption || RedirectEnum.BLANK}
+                    name="radio-buttons-group"
+                    onChange={handleRadioChange}
+                    value={redirectOption}
                   >
-                    +
-                  </Button>
-                </form>
-              </label>
-              <br />
-              {redirectLink && `Current Redirect: https://${redirectLink}`}
-            </div>
-            <div className="content-column">
-              <FormControl>
-                <FormLabel>Redirect</FormLabel>
-                <RadioGroup
-                  defaultValue={redirectOption || RedirectEnum.BLANK}
-                  name="radio-buttons-group"
-                  onChange={handleRadioChange}
-                  value={redirectOption}
-                >
-                  <FormControlLabel value={RedirectEnum.URL} control={<Radio />} label="My URL" />
-                  <FormControlLabel
-                    value={RedirectEnum.DEFAULT}
-                    control={<Radio />}
-                    label="Default"
-                  />
-                  <FormControlLabel
-                    value={RedirectEnum.BLANK}
-                    control={<Radio />}
-                    label="Blank Page"
-                  />
-                  <FormControlLabel
-                    value={RedirectEnum.ENCOURAGING}
-                    control={<Radio />}
-                    label="Encouraging Tips"
-                  />
-                  <FormControlLabel
-                    value={RedirectEnum.OFFENSIVE}
-                    control={<Radio />}
-                    label="Offensive Tips"
-                  />
-                </RadioGroup>
-              </FormControl>
+                    <FormControlLabel value={RedirectEnum.URL} control={<Radio />} label="My URL" />
+                    <FormControlLabel
+                      value={RedirectEnum.DEFAULT}
+                      control={<Radio />}
+                      label="Default"
+                    />
+                    <FormControlLabel
+                      value={RedirectEnum.BLANK}
+                      control={<Radio />}
+                      label="Blank Page"
+                    />
+                    <FormControlLabel
+                      value={RedirectEnum.ENCOURAGING}
+                      control={<Radio />}
+                      label="Encouraging Tips"
+                    />
+                    <FormControlLabel
+                      value={RedirectEnum.OFFENSIVE}
+                      control={<Radio />}
+                      label="Offensive Tips"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </div>
             </div>
           </div>
         </div>

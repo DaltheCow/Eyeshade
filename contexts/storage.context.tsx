@@ -26,6 +26,9 @@ const Context = React.createContext({
   },
   setTimer: async (timer: number | null, timerMinutes?: number, timerHours?: number) =>
     new Promise(() => Promise.resolve()),
+  toggleHttps: async (isHttps: boolean) => {
+    //nothing
+  },
 });
 
 type StorageContextProps = {
@@ -58,6 +61,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         timer,
         savedMinutes,
         savedHours,
+        isHttps,
       } = settings;
       setDataStorage({
         isBlocking,
@@ -69,6 +73,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         timer,
         savedMinutes,
         savedHours,
+        isHttps,
       });
       setIsLoaded(true);
     });
@@ -88,6 +93,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
           "timer",
           "savedMinutes",
           "savedHours",
+          "isHttps",
         ];
         while (JSON.stringify(oldValue[fields[0]]) === JSON.stringify(newValue[fields[0]])) {
           fields.shift();
@@ -314,6 +320,16 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     });
   };
 
+  const toggleHttps = async (isHttps: boolean) => {
+    getStorage("settings", (data: any) => {
+      const settings = {
+        ...data.settings,
+        isHttps,
+      };
+      return setStorage("settings", { settings });
+    });
+  };
+
   const values = React.useMemo(() => {
     return {
       isLoaded,
@@ -326,6 +342,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
       updateRedirectLink,
       updateRedirectOption,
       setTimer,
+      toggleHttps,
     };
   }, [
     isLoaded,
@@ -338,6 +355,7 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     updateRedirectLink,
     updateRedirectOption,
     setTimer,
+    toggleHttps,
   ]);
 
   return <Context.Provider value={values}>{children}</Context.Provider>;

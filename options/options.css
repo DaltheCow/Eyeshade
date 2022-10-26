@@ -82,6 +82,18 @@ ul.site-list {
   min-height: 40px;
 }
 
+.padded-box {
+  margin-right: 3px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .site-list .fake-link {
   margin-left: 15px;
 }

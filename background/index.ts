@@ -37,19 +37,35 @@ export type Settings = {
   timer?: number | null;
   savedMinutes: number;
   savedHours: number;
+  isHttps: boolean;
 };
 
 (function () {
   getStorageAll(["settings"]).then((data) => {
     ensureSettings(data, (newData: any) => {
-      const { isBlocking, isWhiteListing, siteList, whiteListSites, redirectLink, redirectOption } =
-        newData.settings as Settings;
+      const {
+        isBlocking,
+        isWhiteListing,
+        siteList,
+        whiteListSites,
+        redirectLink,
+        redirectOption,
+        isHttps,
+      } = newData.settings as Settings;
       if (isBlocking || isWhiteListing) {
         chrome.tabs.query({}, function (tabs) {
           const sites = (isWhiteListing ? whiteListSites : siteList) || [];
           Array.from(tabs).forEach((tab) => {
             if (tab.url) {
-              blockSites(tab.id, tab.url, sites, isWhiteListing, redirectLink, redirectOption);
+              blockSites(
+                tab.id,
+                tab.url,
+                isHttps,
+                sites,
+                isWhiteListing,
+                redirectLink,
+                redirectOption
+              );
             }
           });
         });
@@ -60,11 +76,26 @@ export type Settings = {
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
   getStorage("settings", function (data: any) {
-    const { isBlocking, isWhiteListing, siteList, whiteListSites, redirectLink, redirectOption } =
-      data.settings;
+    const {
+      isBlocking,
+      isWhiteListing,
+      siteList,
+      whiteListSites,
+      redirectLink,
+      redirectOption,
+      isHttps,
+    } = data.settings;
     if ((isBlocking || isWhiteListing) && changeInfo.url) {
       const sites = isWhiteListing ? whiteListSites : siteList;
-      blockSites(tabId, changeInfo.url, sites, isWhiteListing, redirectLink, redirectOption);
+      blockSites(
+        tabId,
+        changeInfo.url,
+        isHttps,
+        sites,
+        isWhiteListing,
+        redirectLink,
+        redirectOption
+      );
     }
   });
 });
@@ -90,6 +121,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
         redirectLink,
         redirectOption,
         timer,
+        isHttps,
       } = newValue;
       // TODO in future can make it possible to turn off block sites and then any page would go back to what was originally searched (if I save searched vid per tab prior to blocking said page). currently blocking it seems to overwrite the page in history
       const blockingWasDisabled =
@@ -111,7 +143,15 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
           const siteList = nIsWhiteListing ? nWhiteListSites : nSiteList;
           Array.from(tabs).forEach((tab) => {
             if (tab.url) {
-              blockSites(tab.id, tab.url, siteList, nIsWhiteListing, redirectLink, redirectOption);
+              blockSites(
+                tab.id,
+                tab.url,
+                isHttps,
+                siteList,
+                nIsWhiteListing,
+                redirectLink,
+                redirectOption
+              );
             }
           });
         });
@@ -129,6 +169,7 @@ const ignoreSite = (url: string) => {
 function blockSites(
   tabId: any,
   url: string,
+  isHttps: boolean,
   siteList: string[],
   isWhitelist = false,
   redirectLink: string | undefined,
@@ -143,7 +184,9 @@ function blockSites(
     // can I push the current url onto history so it isn't lost before redirect?
     const url =
       redirectOption === RedirectEnum.URL && redirectLink
-        ? "https://" + redirectLink
+        ? isHttps
+          ? "https://"
+          : "http://" + redirectLink
         : "not_available/not_available.html";
     chrome.tabs.update(tabId, { url });
   }
@@ -162,6 +205,7 @@ function ensureSettings(data: any, callback: any) {
     timer,
     savedMinutes,
     savedHours,
+    isHttps,
   } = prevSettings;
 
   isBlocking = Boolean(isBlocking);
@@ -173,6 +217,7 @@ function ensureSettings(data: any, callback: any) {
   timer ||= null;
   savedMinutes ||= 0;
   savedHours ||= 0;
+  isHttps = isHttps !== false;
   const settings = {
     isBlocking,
     siteList,
