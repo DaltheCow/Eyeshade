@@ -6,6 +6,7 @@ export enum RedirectEnum {
   DEFAULT = "DEFAULT",
   ENCOURAGING = "ENCOURAGING",
   OFFENSIVE = "OFFENSIVE",
+  WHIMSICAL = "WHIMSICAL",
   CUSTOM = "CUSTOM",
 }
 
