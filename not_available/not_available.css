@@ -32,6 +32,12 @@ body {
   font-family: "Cedarville Cursive", cursive;
 }
 
+.quotes-card.whimsical-theme {
+  background: radial-gradient(#f6c19c, #845f86);
+  color: #222222;
+  font-family: "Indie Flower", cursive;
+}
+
 .quotes-card.default-theme {
   background: radial-gradient(#414247, #1b1b1d);
   color: rgb(238, 238, 238);

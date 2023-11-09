@@ -372,6 +372,11 @@ const App = () => {
                       control={<Radio />}
                       label="Offensive Tips"
                     />
+                    <FormControlLabel
+                      value={RedirectEnum.WHIMSICAL}
+                      control={<Radio />}
+                      label="Whimsical Tips"
+                    />
                   </RadioGroup>
                 </FormControl>
               </div>

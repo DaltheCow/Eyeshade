@@ -4,11 +4,6 @@
   "version": "0.0.0.3",
   "description": "An extension to block as many sites as you want",
   "action": {
-    "default_icon": {
-      "16": "Eyeshade.png",
-      "32": "Eyeshade.png",
-      "128": "Eyeshade.png"
-    },
     "default_title": "Right Click Me",
     "default_popup": "popup/popup.html"
   },
@@ -33,11 +28,6 @@
   "icons": {
     "16": "Eyeshade.png",
     "48": "Eyeshade.png",
-    "128": "Eyeshade.png"
-  },
-  "default_icon": {
-    "16": "Eyeshade.png",
-    "32": "Eyeshade.png",
     "128": "Eyeshade.png"
   }
 }
