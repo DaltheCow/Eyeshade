@@ -13,16 +13,7 @@ import { useStorageContext, StorageProvider } from "../contexts/storage.context"
 import { RedirectEnum } from "../background/index";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import Snackbar from "@mui/material/Snackbar";
-123456;
-function formatTimer(ms: number) {
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-  if (minutes <= 0 && seconds <= 0) return "0";
-  return `${hours ? hours + ":" : ""}${!minutes && hours ? "00:" : ""}${
-    minutes ? minutes + ":" : ""
-  }${seconds < 10 ? "0" : ""}${seconds}`;
-}
+import { formatTimer } from "utils/helpers";
 
 const App = () => {
   const {
