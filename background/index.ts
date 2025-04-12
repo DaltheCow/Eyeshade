@@ -127,12 +127,12 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
       const blockingWasDisabled =
         (nIsBlocking !== oldValue.isBlocking && !nIsBlocking) ||
         (nIsWhiteListing !== oldValue.isWhiteListing && !nIsWhiteListing);
-      if (blockingWasDisabled) {
+      if (timer && blockingWasDisabled) {
         chrome.alarms.clearAll();
         setTimeout(() => {
           const newSettings = { settings: { ...newValue, timer: null } };
           setStorage("settings", newSettings);
-        }, 100);
+        }, 10);
       }
       if (!timer && oldValue.timer) chrome.alarms.clearAll();
       if (timer && timer !== oldValue.timer) {
