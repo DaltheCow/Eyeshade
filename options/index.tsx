@@ -13,16 +13,8 @@ import { useStorageContext, StorageProvider } from "../contexts/storage.context"
 import { RedirectEnum } from "../background/index";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import Snackbar from "@mui/material/Snackbar";
-123456;
-function formatTimer(ms: number) {
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-  if (minutes <= 0 && seconds <= 0) return "0";
-  return `${hours ? hours + ":" : ""}${!minutes && hours ? "00:" : ""}${
-    minutes ? minutes + ":" : ""
-  }${seconds < 10 ? "0" : ""}${seconds}`;
-}
+import { formatTimer } from "../utils/helpers";
+import { usePrevious } from "../utils/hooks/usePrevious";
 
 const App = () => {
   const {
@@ -61,7 +53,8 @@ const App = () => {
   const [timerHours, setTimerHours] = React.useState(savedHours || 0);
   const [open, setOpen] = React.useState(false);
   const [shouldAlertSaved, setShouldAlertSaved] = React.useState(false);
-
+  const newTime = React.useMemo(() => formatTimer(countdown || 0), [countdown]);
+  const previousTime = usePrevious(newTime);
   React.useEffect(() => {
     if (redirectLink) {
       setRedirectLinkInput(redirectLink);
@@ -81,13 +74,16 @@ const App = () => {
     }
     if (timer) {
       const intvl = setInterval(() => {
-        setCountdown(timer - Date.now());
+        const newTime = formatTimer(timer - Date.now() || 0);
+        if (previousTime !== newTime) {
+          setCountdown(timer - Date.now());
+        }
       }, 100);
       setIntervalId(intvl);
 
       return () => clearInterval(intvl);
     }
-  }, [timer]);
+  }, [timer, previousTime, newTime]);
 
   if (!isLoaded) return <></>;
 
@@ -189,7 +185,7 @@ const App = () => {
                   >
                     Stop
                   </Button>
-                  <div>{formatTimer(countdown || 0)}</div>
+                  <div>{newTime}</div>
                 </div>
               ) : (
                 <div style={{ marginTop: "12px" }}>
