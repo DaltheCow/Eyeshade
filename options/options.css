@@ -44,6 +44,10 @@ body {
   cursor: default;
 }
 
+a.fake-link.disabled {
+  color: rgba(0, 0, 0, 0.26);
+}
+
 .icon-container {
   cursor: pointer;
 }
@@ -80,6 +84,12 @@ ul.site-list {
   min-width: 269px;
   width: 270px;
   min-height: 40px;
+  position: relative;
+}
+
+.power-button {
+  position: absolute;
+  right: 10px;
 }
 
 .padded-box {

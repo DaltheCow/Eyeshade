@@ -12,9 +12,11 @@ import { render } from "react-dom";
 import { useStorageContext, StorageProvider } from "../contexts/storage.context";
 import { RedirectEnum } from "../background/index";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import Snackbar from "@mui/material/Snackbar";
-import { formatTimer } from "../utils/helpers";
+import { formatTimer, truncateText } from "../utils/helpers";
 import { usePrevious } from "../utils/hooks/usePrevious";
+import { Tooltip } from "@mui/material";
 
 const App = () => {
   const {
@@ -29,6 +31,8 @@ const App = () => {
     updateRedirectOption,
     setTimer,
     toggleHttps,
+    toggleLink,
+    toggleWhiteListLink,
   } = useStorageContext();
   const {
     siteList,
@@ -41,8 +45,9 @@ const App = () => {
     savedMinutes,
     savedHours,
     isHttps,
+    turnedOffBlockListSites,
+    turnedOffWhiteListSites,
   } = dataStorage;
-  // pull minutes, hours from dataStorage
 
   const [site, setSite] = React.useState("");
   const [whiteListSite, setWhiteListSite] = React.useState("");
@@ -243,14 +248,20 @@ const App = () => {
               </div>
               <ul style={{ marginTop: "15px" }} className="site-list">
                 {siteList?.map((url: string) => {
+                  const disabled = turnedOffBlockListSites.includes(url);
                   return (
                     <li key={url}>
                       <div className="icon-container" onClick={() => deleteLink(url)}>
                         <DeleteOutlinedIcon />
                       </div>
-                      <a className="fake-link" href="#">
-                        https://{url}
-                      </a>
+                      <Tooltip style={{ cursor: "pointer" }} title={`https://${url}`}>
+                        <a className={`fake-link${disabled ? " disabled" : ""}`} href="#">
+                          {truncateText(`https://${url}`, 30)}
+                        </a>
+                      </Tooltip>
+                      <div className="icon-container power-button" onClick={() => toggleLink(url)}>
+                        <PowerSettingsNewIcon color={disabled ? "disabled" : "secondary"} />
+                      </div>
                     </li>
                   );
                 })}
@@ -281,14 +292,21 @@ const App = () => {
               </div>
               <ul style={{ marginTop: "15px" }} className="site-list">
                 {whiteListSites?.map((url: string) => {
+                  const disabled = turnedOffWhiteListSites.includes(url);
                   return (
                     <li key={url} style={{ display: "flex" }}>
                       <div className="icon-container" onClick={() => deleteWhiteListLink(url)}>
                         <DeleteOutlinedIcon />
                       </div>
                       <a className="fake-link" href="#">
-                        https://{url}
+                        {truncateText(`https://${url}`, 35)}
                       </a>
+                      <div
+                        className="icon-container power-button"
+                        onClick={() => toggleWhiteListLink(url)}
+                      >
+                        <PowerSettingsNewIcon color={disabled ? "disabled" : "secondary"} />
+                      </div>
                     </li>
                   );
                 })}
@@ -299,12 +317,12 @@ const App = () => {
                 <label>
                   <h4>
                     Redirect Website{" "}
-                    <span
+                    <Tooltip
                       style={{ cursor: "pointer" }}
                       title="Your redirect url should:&#013;redirect to a whitelist site when whitelisting;&#013;redirect to a non blocked site when blocking"
                     >
-                      &#9432;
-                    </span>
+                      <span>&#9432;</span>
+                    </Tooltip>
                   </h4>
                   <form
                     style={{ display: "flex", alignItems: "center", justifyContent: "center" }}

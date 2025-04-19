@@ -29,6 +29,12 @@ const Context = React.createContext({
   toggleHttps: async (isHttps: boolean) => {
     //nothing
   },
+  toggleLink: (url: string) => {
+    //nothing
+  },
+  toggleWhiteListLink: (url: string) => {
+    //nothing
+  },
 });
 
 type StorageContextProps = {
@@ -62,6 +68,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         savedMinutes,
         savedHours,
         isHttps,
+        turnedOffBlockListSites,
+        turnedOffWhiteListSites,
       } = settings;
       setDataStorage({
         isBlocking,
@@ -74,6 +82,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
         savedMinutes,
         savedHours,
         isHttps,
+        turnedOffBlockListSites,
+        turnedOffWhiteListSites,
       });
       setIsLoaded(true);
     });
@@ -94,6 +104,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
           "savedMinutes",
           "savedHours",
           "isHttps",
+          "turnedOffBlockListSites",
+          "turnedOffWhiteListSites",
         ];
         while (JSON.stringify(oldValue[fields[0]]) === JSON.stringify(newValue[fields[0]])) {
           fields.shift();
@@ -169,9 +181,12 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
 
   const deleteLink = (url: string) => {
     getStorage("settings", (data: any) => {
-      let { siteList } = data.settings;
+      let { siteList, turnedOffBlockListSites } = data.settings;
       siteList = siteList.filter((siteURL: string) => siteURL !== url);
-      const settings = Object.assign({}, data.settings, { siteList });
+      turnedOffBlockListSites = turnedOffBlockListSites.filter(
+        (siteURL: string) => siteURL !== url
+      );
+      const settings = Object.assign({}, data.settings, { siteList, turnedOffBlockListSites });
       setStorage("settings", { settings });
     });
   };
@@ -179,9 +194,46 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
   const deleteWhiteListLink = async (url: string) => {
     await conflictHandler(FieldUpdateEnum.REMOVE_FROM_WHITELIST, url);
     getStorage("settings", (data: any) => {
-      let { whiteListSites } = data.settings;
+      let { whiteListSites, turnedOffWhiteListSites } = data.settings;
       whiteListSites = whiteListSites.filter((siteURL: string) => siteURL !== url);
-      const settings = Object.assign({}, data.settings, { whiteListSites });
+      turnedOffWhiteListSites = turnedOffWhiteListSites.filter(
+        (siteURL: string) => siteURL !== url
+      );
+      const settings = Object.assign({}, data.settings, {
+        whiteListSites,
+        turnedOffWhiteListSites,
+      });
+      setStorage("settings", { settings });
+    });
+  };
+
+  const toggleLink = (url: string) => {
+    getStorage("settings", (data: any) => {
+      let { turnedOffBlockListSites } = data.settings;
+      if (turnedOffBlockListSites.includes(url)) {
+        turnedOffBlockListSites = turnedOffBlockListSites.filter(
+          (siteURL: string) => siteURL !== url
+        );
+      } else {
+        turnedOffBlockListSites = [...turnedOffBlockListSites, url];
+      }
+      const settings = Object.assign({}, data.settings, { turnedOffBlockListSites });
+      setStorage("settings", { settings });
+    });
+  };
+
+  const toggleWhiteListLink = async (url: string) => {
+    await conflictHandler(FieldUpdateEnum.REMOVE_FROM_WHITELIST, url);
+    getStorage("settings", (data: any) => {
+      let { turnedOffWhiteListSites } = data.settings;
+      if (turnedOffWhiteListSites.includes(url)) {
+        turnedOffWhiteListSites = turnedOffWhiteListSites.filter(
+          (siteURL: string) => siteURL !== url
+        );
+      } else {
+        turnedOffWhiteListSites = [...turnedOffWhiteListSites, url];
+      }
+      const settings = Object.assign({}, data.settings, { turnedOffWhiteListSites });
       setStorage("settings", { settings });
     });
   };
@@ -343,6 +395,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
       updateRedirectOption,
       setTimer,
       toggleHttps,
+      toggleLink,
+      toggleWhiteListLink,
     };
   }, [
     isLoaded,
@@ -356,6 +410,8 @@ export const StorageProvider = ({ children }: StorageContextProps) => {
     updateRedirectOption,
     setTimer,
     toggleHttps,
+    toggleLink,
+    toggleWhiteListLink,
   ]);
 
   return <Context.Provider value={values}>{children}</Context.Provider>;
