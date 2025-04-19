@@ -1,13 +1,18 @@
-import React, { Component } from 'react';
-import { render } from 'react-dom';
+import { Button } from "@mui/material";
+import React, { Component } from "react";
+import { render } from "react-dom";
 
 const App = () => {
   return (
-    <div>
-      Right click to open options
-    </div>
+    <Button
+      sx={{ width: "125px" }}
+      size="small"
+      variant="outlined"
+      onClick={() => chrome.runtime.openOptionsPage()}
+    >
+      Open options
+    </Button>
   );
-}
+};
 
-
-render(<App />, document.getElementById('root'));
+render(<App />, document.getElementById("root"));
