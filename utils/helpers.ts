@@ -7,3 +7,10 @@ export function formatTimer(ms: number) {
     minutes ? (hours && minutes < 10 ? "0" : "") + minutes + ":" : ""
   }${seconds < 10 ? "0" : ""}${seconds}`;
 }
+
+export const truncateText = (text: string, length: number) => {
+  if (text.length > length + 1) {
+    return text.slice(0, length) + "...";
+  }
+  return text;
+};
